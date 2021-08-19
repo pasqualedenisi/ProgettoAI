@@ -22,6 +22,8 @@ public class Car implements Vehicle {
 				orientation = false;
 			else orientation = true;
 		}
+		for ( Coordinate c : busyBlocks )
+			c.setOccupier(this);
 	}
 
 	@Override

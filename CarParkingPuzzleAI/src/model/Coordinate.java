@@ -4,6 +4,7 @@ public class Coordinate {
 
 	private Integer row;
 	private Integer column;
+	private Vehicle occupier; //observer
 	
 	public Coordinate(Integer row, Integer column) {
 		super();
@@ -26,5 +27,9 @@ public class Coordinate {
 	@Override
 	public String toString() {
 		return "R="+row+" C="+column;
+	}
+	
+	public void setOccupier(Vehicle occupier) {
+		this.occupier = occupier;
 	}
 }
