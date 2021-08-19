@@ -1,0 +1,23 @@
+LV.1
+	mycar: 2,1;2,2
+	othercar: 0,0;0,1
+	othercar: 0,4;0,5
+	othercar: 1,0;2,0
+	othercar: 1,4;2,4
+	othercar: 1,5;2,5
+	othercar: 5,3;5,4
+	truck: 3,0;4,0;5,0
+	truck: 2,3;3,3;4,3
+	
+LV.2
+	mycar: 2,0;2,1
+	othercar: 0,0;0,1 
+	othercar: 1,1;1,2
+	othercar: 0,4;0,5
+	othercar: 1,4;2,4
+	othercar: 2,2;3,2
+	othercar: 4,0;5,0
+	othercar: 4,1;5,1
+	othercar: 5,2;5,3
+	othercar: 4,3;4,4
+	truck: 0,3;1,3;2,3
