@@ -62,12 +62,18 @@ public class Truck implements Vehicle {
 				newPosition = b.getCoordinate().getColumn()-signedDistance;
 				newBlockBusy = blockMatrix[b.getCoordinate().getRow()][newPosition];
 			}
+			System.out.println("Da" + b + " a " + newBlockBusy);
 			newBlockBusy.setState(this.getBlockState());
-			newBlockBusy.setOccupier(this);
+			//newBlockBusy.setOccupier(this);
+			System.out.println("occupier di "+newBlockBusy+" = "+newBlockBusy.getOccupier());
 			newBusyList.add(newBlockBusy);
 			b.setOccupier(null);
+			System.out.println("occupier di "+b+" = "+b.getOccupier());
 		}
 		busyBlocks = newBusyList;
+		for ( Block b : busyBlocks ) {
+			b.setOccupier(this);
+		}
 		System.out.println("New blocks = "+busyBlocks);
 		Game.getInstance().printMatrix();
 		

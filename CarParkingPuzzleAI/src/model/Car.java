@@ -72,11 +72,14 @@ public class Car implements Vehicle {
 				newBlockBusy = blockMatrix[b.getCoordinate().getRow()][newPosition];
 			}
 			newBlockBusy.setState(this.getBlockState());
-			newBlockBusy.setOccupier(this);
+			//newBlockBusy.setOccupier(this);
 			newBusyList.add(newBlockBusy);
 			b.setOccupier(null);
 		}
 		busyBlocks = newBusyList;
+		for ( Block b : busyBlocks ) {
+			b.setOccupier(this);
+		}
 		System.out.println("New blocks = "+busyBlocks);
 		Game.getInstance().printMatrix();
 		if ( getBlockState() == BlockType.MYCAR )
