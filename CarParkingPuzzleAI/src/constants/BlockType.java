@@ -11,5 +11,6 @@ public class BlockType {
 	public final static int TRUCK_SIZE=3;
 	public final static int CAR_SIZE=2;
 	public final static int BLOCK_PIXELS=50;
+	public final static int FREE_MARGIN=10;
 	
 }

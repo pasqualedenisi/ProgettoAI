@@ -36,19 +36,19 @@ public class GameFrame extends JFrame {
 		
 		screenContainer = ScreenManager.getInstance();
 		
-		GamePanel gp = new GamePanel();
+		GameScreen screen = new GameScreen();
 		LevelsPanel levelPane = new LevelsPanel();
 		StartMenuPanel menu = new StartMenuPanel();
 		add(screenContainer);
 		screenContainer.add(menu);
-		screenContainer.add(gp);
+		screenContainer.add(screen);
 		screenContainer.add(levelPane);
 		screenContainer.getInstance().getCards().addLayoutComponent(menu, Screens.START_MENU);
-		screenContainer.getInstance().getCards().addLayoutComponent(gp, Screens.DURING_GAME);
+		screenContainer.getInstance().getCards().addLayoutComponent(screen, Screens.DURING_GAME);
 		screenContainer.getInstance().getCards().addLayoutComponent(levelPane, Screens.LEVELS_OVERVIEW);
 		screenContainer.getInstance().getCards().show(screenContainer, Screens.START_MENU);
 		setSize(new Dimension(700,700));
-		setUndecorated(true);
+		//setUndecorated(true);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();

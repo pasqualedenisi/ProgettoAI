@@ -8,18 +8,18 @@ import constants.Screens;
 public class Truck implements Vehicle {
 
 	private Boolean orientation;
-	private ArrayList<Coordinate> busyBlocks;
+	private ArrayList<Block> busyBlocks;
 	
-	public Truck(ArrayList<Coordinate> busyBlocks) {
+	public Truck(ArrayList<Block> busyBlocks) {
 		super();
 		this.busyBlocks = busyBlocks;
 		if (busyBlocks.size()>1) {
-			if ( busyBlocks.get(0).getRow() == busyBlocks.get(1).getRow() )
+			if ( busyBlocks.get(0).getCoordinate().getRow() == busyBlocks.get(1).getCoordinate().getRow() )
 				orientation = false;
 			else orientation = true;
 		}
-		for ( Coordinate c : busyBlocks )
-			c.setOccupier(this);
+		for ( Block b : busyBlocks )
+			b.setOccupier(this);
 	}
 
 	@Override
@@ -32,8 +32,44 @@ public class Truck implements Vehicle {
 	}
 
 	@Override
-	public void move() {
-		// TODO Auto-generated method stub
+	public void move(Block destinationBlock) {
+		System.out.println("Moving to"+destinationBlock);
+		Integer minDistance = BlockType.COLUMNS + BlockType.ROWS;
+		Integer currentDistance;
+		Integer signedDistance = minDistance;
+		Block blockMatrix[][] = Game.getInstance().getBlocks();
+		for ( Block b : busyBlocks ) {
+			blockMatrix[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setState(BlockType.EMPTY);
+			if ( orientation )
+				currentDistance = b.getCoordinate().getRow()-destinationBlock.getCoordinate().getRow();
+			else
+				currentDistance = b.getCoordinate().getColumn()-destinationBlock.getCoordinate().getColumn();
+			if ( Math.abs(currentDistance) < minDistance ) {
+				minDistance = Math.abs(currentDistance);
+				signedDistance = currentDistance;
+			}
+		}
+		System.out.println("min dist = " + minDistance);
+		ArrayList<Block> newBusyList = new ArrayList<Block>();
+		for ( Block b : busyBlocks ) {
+			Integer newPosition;
+			Block newBlockBusy;
+			if ( orientation ) {
+				newPosition = b.getCoordinate().getRow()-signedDistance;
+				newBlockBusy = blockMatrix[newPosition][b.getCoordinate().getColumn()];
+			}
+			else {
+				newPosition = b.getCoordinate().getColumn()-signedDistance;
+				newBlockBusy = blockMatrix[b.getCoordinate().getRow()][newPosition];
+			}
+			newBlockBusy.setState(this.getBlockState());
+			newBlockBusy.setOccupier(this);
+			newBusyList.add(newBlockBusy);
+			b.setOccupier(null);
+		}
+		busyBlocks = newBusyList;
+		System.out.println("New blocks = "+busyBlocks);
+		Game.getInstance().printMatrix();
 		
 	}
 	
@@ -43,7 +79,7 @@ public class Truck implements Vehicle {
 	}
 
 	@Override
-	public ArrayList<Coordinate> getBusyBlocks() {
+	public ArrayList<Block> getBusyBlocks() {
 		return busyBlocks;
 	}
 	

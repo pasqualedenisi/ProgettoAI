@@ -48,7 +48,7 @@ public class Game {
 		blocks = new Block[BlockType.ROWS][BlockType.COLUMNS];
 		for ( int i = 0; i < BlockType.ROWS; ++i )
 			for ( int j = 0; j < BlockType.COLUMNS; ++j )
-				blocks[i][j] = new Block();
+				blocks[i][j] = new Block(i,j);
 		moves=0;
 		level = 1;
 		otherVehicles = new ArrayList<Vehicle>();
@@ -90,25 +90,29 @@ public class Game {
 						pattern = Pattern.compile(regex);
 						matcher = pattern.matcher(busyBlocks);
 						//System.out.println("Vehicle = " + vehicle);
-						ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
+						ArrayList<Block> blocks = new ArrayList<Block>();
 						while (matcher.find()) {
 							String coordinateString = matcher.group(1);
 							String[] parts = coordinateString.split(",");
 							Coordinate coordinate = new Coordinate(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
-							coordinates.add(coordinate);
+							blocks.add(Game.getInstance().getBlocks()[coordinate.getRow()][coordinate.getColumn()]);
 						}
 						switch(vehicle) {
 							case (MatchLevel.myCar):
-								myCar = new Car(coordinates);
+								myCar = new Car(blocks);
 								myCar.setMine(true);
 								break;
 							case (MatchLevel.anotherCar):
-								Car anotherCar = new Car(coordinates);
+								Car anotherCar = new Car(blocks);
 								otherVehicles.add(anotherCar);
 								break;
 							case (MatchLevel.truck):
-								Truck truck = new Truck(coordinates);
+								Truck truck = new Truck(blocks);
 								otherVehicles.add(truck);
+								break;
+							case (MatchLevel.finalPosition):
+								if ( blocks.get(0) != null )
+									blocks.get(0).setWinner(true);
 								break;
 							default:
 								break;
@@ -125,7 +129,7 @@ public class Game {
 		}
 	}
 
-	private void printMatrix() {
+	public void printMatrix() {
 		for ( int i = 0; i < BlockType.ROWS; ++i ) {
 			for ( int j = 0; j < BlockType.COLUMNS; ++j )
 				System.out.print(blocks[i][j].getState() + " ");
@@ -134,12 +138,12 @@ public class Game {
 	}
 
 	private void disposeVehicles() {
-		for ( Coordinate c : myCar.getBusyBlocks() ) {
-			blocks[c.getRow()][c.getColumn()].setState(myCar.getBlockState());
+		for ( Block b : myCar.getBusyBlocks() ) {
+			blocks[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setOccupier(myCar);
 		}
 		for ( Vehicle v : otherVehicles ) {
-			for ( Coordinate c : v.getBusyBlocks() ) {
-				blocks[c.getRow()][c.getColumn()].setState(v.getBlockState());
+			for ( Block b : v.getBusyBlocks() ) {
+				blocks[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setOccupier(v);
 			}
 		}
 	}
