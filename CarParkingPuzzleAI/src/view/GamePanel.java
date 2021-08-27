@@ -16,6 +16,8 @@ import constants.Screens;
 import controller.ClickHandler;
 import model.Block;
 import model.Car;
+import model.Coordinate;
+import model.VehicleOperator;
 import model.Game;
 import model.Vehicle;
 
@@ -46,31 +48,6 @@ public class GamePanel extends JPanel {
 		addMouseListener(new ClickHandler());
 	}
 	
-	/*
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Block[][] b = game.getBlocks();
-		for ( int i = 0; i < b.length; ++i ) {
-			for ( int j = 0; j < b[i].length; ++j )	
-				switch (b[i][j].getState()) {
-				case BlockType.MYCAR:
-					g.drawString("mine", j*BlockType.BLOCK_PIXELS, i*BlockType.BLOCK_PIXELS+20);
-					break;
-				case BlockType.CAR:
-					g.drawString("other", j*BlockType.BLOCK_PIXELS, i*BlockType.BLOCK_PIXELS+20);
-					break;
-				case BlockType.TRUCK:
-					g.drawString("truck", j*BlockType.BLOCK_PIXELS, i*BlockType.BLOCK_PIXELS+20);
-					break;
-				default:
-					g.drawString("empty", j*BlockType.BLOCK_PIXELS, i*BlockType.BLOCK_PIXELS+20);
-					break;
-					
-			}
-		}	
-	}
-	 */
 	
 	public ArrayList<Block> getFreeBlocks() {
 		return freeBlocks;
@@ -99,37 +76,15 @@ public class GamePanel extends JPanel {
 	}
 	
 	private void drawVehicle(Vehicle v, Graphics g){
-		/*
-		ArrayList<Integer> rowIndexes = new ArrayList<Integer>();
-		ArrayList<Integer> columnIndexes = new ArrayList<Integer>();
-		for ( Block b : v.getBusyBlocks() ) {
-			rowIndexes.add(b.getCoordinate().getRow());
-			columnIndexes.add(b.getCoordinate().getColumn());
+		VehicleOperator calculator = new VehicleOperator();
+		Coordinate[] extremities = calculator.calculateExtremities(v);
+		if ( extremities.length == 2 ) {
+			Integer startX = extremities[0].getColumn();
+			Integer startY = extremities[0].getRow();
+			Integer endX = extremities[1].getColumn();
+			Integer endY = extremities[1].getRow();
+			g.drawImage(images.get(v.getImageString()), startX*BlockType.BLOCK_PIXELS, startY*BlockType.BLOCK_PIXELS, (endX-startX+1)*BlockType.BLOCK_PIXELS, (endY-startY+1)*BlockType.BLOCK_PIXELS, null);
 		}
-		Integer startX = Collections.min(columnIndexes);
-		Integer startY = Collections.min(rowIndexes);
-		Integer endX = Collections.max(columnIndexes);
-		Integer endY = Collections.max(rowIndexes);
-		*/
-		Integer startX = BlockType.COLUMNS;
-		Integer startY = BlockType.ROWS;
-		Integer endX = 0;
-		Integer endY = 0;
-		Integer blockRow;
-		Integer blockColumn;
-		for ( Block b : v.getBusyBlocks() ) {
-			blockRow = b.getCoordinate().getRow();
-			blockColumn = b.getCoordinate().getColumn();
-			if ( blockColumn < startX )
-				startX = blockColumn;
-			if ( blockColumn > endX )
-				endX = blockColumn;
-			if ( blockRow < startY )
-				startY = blockRow;
-			if ( blockRow > endY )
-				endY = blockRow;
-		}
-		g.drawImage(images.get(v.getImageString()), startX*BlockType.BLOCK_PIXELS, startY*BlockType.BLOCK_PIXELS, (endX-startX+1)*BlockType.BLOCK_PIXELS, (endY-startY+1)*BlockType.BLOCK_PIXELS, null);
 	}
 
 	public Vehicle getSelected() {

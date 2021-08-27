@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import constants.BlockType;
 import constants.Screens;
 import levels.MatchLevel;
+import view.GameScreen;
 
 //singleton
 public class Game {
@@ -21,6 +22,7 @@ public class Game {
 	private Integer level;
 	private static Game instance;
 	private Boolean isMatrixWritten;
+	private GameScreen movesDisplayer;
 	
 	public static Game getInstance() {
 		if (instance == null)
@@ -53,10 +55,11 @@ public class Game {
 		level = 1;
 		otherVehicles = new ArrayList<Vehicle>();
 		isMatrixWritten = false;
-		//setLevel(level);
 	}
 
-	public void setLevel(Integer level) {
+	public void setLevel(Integer levelPassed) {
+		resetMoves();
+		this.level = levelPassed;
 		if ( isMatrixWritten ) {
 			resetMatrix();
 			otherVehicles.clear();
@@ -139,11 +142,13 @@ public class Game {
 
 	private void disposeVehicles() {
 		for ( Block b : myCar.getBusyBlocks() ) {
-			blocks[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setOccupier(myCar);
+			//blocks[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setOccupier(myCar);
+			b.occupate(myCar);
 		}
 		for ( Vehicle v : otherVehicles ) {
 			for ( Block b : v.getBusyBlocks() ) {
-				blocks[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setOccupier(v);
+				//blocks[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setOccupier(v);
+				b.occupate(v);
 			}
 		}
 	}
@@ -151,6 +156,32 @@ public class Game {
 	private void resetMatrix() {
 		for ( int i = 0; i < BlockType.ROWS; ++i )
 			for ( int j = 0; j < BlockType.COLUMNS; ++j )
-				blocks[i][j].setState(BlockType.EMPTY);
+				blocks[i][j].reset();
+	}
+	
+
+	public void incrementMoves() {
+		++moves;
+		movesDisplayer.updateMoves();
+	}
+	
+	public void resetMoves() {
+		moves=0;
+		movesDisplayer.updateMoves();
+	}
+
+	public void attachObserver(GameScreen gameScreen) {
+		movesDisplayer = gameScreen;
+	}
+	
+	public Integer getMoves() {
+		return moves;
+	}
+	
+	public Boolean checkWin(Vehicle v) {
+		if ( !(v instanceof Car) )
+			return false;
+		Car carMoved = (Car) v;
+		return carMoved.checkWin();
 	}
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 import constants.BlockType;
 import model.Block;
+import model.Coordinate;
+import model.VehicleOperator;
 import model.Game;
 import model.Vehicle;
 import view.GamePanel;
@@ -22,70 +24,61 @@ public class ClickHandler extends MouseAdapter {
 		//System.out.println(row.toString() + column.toString());
 		Vehicle v = Game.getInstance().getBlocks()[row][column].getOccupier();
 		GamePanel gp = (GamePanel)e.getSource();
+		VehicleOperator operator = new VehicleOperator();
 		if (v != null) {
 			gp.setSelected(v);
 			System.out.println("vehicle selected");
-			Integer startX = BlockType.COLUMNS;
-			Integer startY = BlockType.ROWS;
-			Integer endX = 0;
-			Integer endY = 0;
-			Integer blockRow;
-			Integer blockColumn;
-			for ( Block b : v.getBusyBlocks() ) {
-				blockRow = b.getCoordinate().getRow();
-				blockColumn = b.getCoordinate().getColumn();
-				if ( blockColumn < startX )
-					startX = blockColumn;
-				if ( blockColumn > endX )
-					endX = blockColumn;
-				if ( blockRow < startY )
-					startY = blockRow;
-				if ( blockRow > endY )
-					endY = blockRow;
-			}
-			//System.out.println("startx= "+startX+ "\nendx= "+endX+"\nstarty= "+startY+"\nendy= "+endY);
-			ArrayList<Block> freeBlocks = new ArrayList<Block>();
-			Block blocks[][] = Game.getInstance().getBlocks();
-			if  (v.getOrientation()) {
-				int rowIterator = startY-1;
-				while ( rowIterator >= 0 ) {
-					//System.out.println("\nri = "+rowIterator+"\nstx = "+startX);
-					if ( blocks[rowIterator][startX].getState() == BlockType.EMPTY ) {
-						freeBlocks.add(blocks[rowIterator][startX]);
-						--rowIterator;
+
+			Coordinate[] extremities = operator.calculateExtremities(v);
+			if ( extremities.length == 2 ) {
+				Integer startX = extremities[0].getColumn();
+				Integer startY = extremities[0].getRow();
+				Integer endX = extremities[1].getColumn();
+				Integer endY = extremities[1].getRow();
+
+				ArrayList<Block> freeBlocks = new ArrayList<Block>();
+				Block blocks[][] = Game.getInstance().getBlocks();
+				if  (v.getOrientation()) {
+					int rowIterator = startY-1;
+					while ( rowIterator >= 0 ) {
+						//System.out.println("\nri = "+rowIterator+"\nstx = "+startX);
+						if ( blocks[rowIterator][startX].getState() == BlockType.EMPTY ) {
+							freeBlocks.add(blocks[rowIterator][startX]);
+							--rowIterator;
+						}
+						else break;
 					}
-					else break;
-				}
-				rowIterator = endY+1;
-				while ( rowIterator < BlockType.ROWS ) {
-					if ( blocks[rowIterator][startX].getState() == BlockType.EMPTY ) {
-						freeBlocks.add(blocks[rowIterator][startX]);
-						++rowIterator;
+					rowIterator = endY+1;
+					while ( rowIterator < BlockType.ROWS ) {
+						if ( blocks[rowIterator][startX].getState() == BlockType.EMPTY ) {
+							freeBlocks.add(blocks[rowIterator][startX]);
+							++rowIterator;
+						}
+						else break;
 					}
-					else break;
 				}
-			}
-			else {
-				int columnIterator = startX-1;
-				while ( columnIterator >= 0 ) {
-					//System.out.println("\nri = "+rowIterator+"\nstx = "+startX);
-					if ( blocks[startY][columnIterator].getState() == BlockType.EMPTY ) {
-						freeBlocks.add(blocks[startY][columnIterator]);
-						--columnIterator;
+				else {
+					int columnIterator = startX-1;
+					while ( columnIterator >= 0 ) {
+						//System.out.println("\nri = "+rowIterator+"\nstx = "+startX);
+						if ( blocks[startY][columnIterator].getState() == BlockType.EMPTY ) {
+							freeBlocks.add(blocks[startY][columnIterator]);
+							--columnIterator;
+						}
+						else break;
 					}
-					else break;
-				}
-				columnIterator = endX+1;
-				while ( columnIterator < BlockType.COLUMNS ) {
-					if ( blocks[startY][columnIterator].getState() == BlockType.EMPTY ) {
-						freeBlocks.add(blocks[startY][columnIterator]);
-						++columnIterator;
+					columnIterator = endX+1;
+					while ( columnIterator < BlockType.COLUMNS ) {
+						if ( blocks[startY][columnIterator].getState() == BlockType.EMPTY ) {
+							freeBlocks.add(blocks[startY][columnIterator]);
+							++columnIterator;
+						}
+						else break;
 					}
-					else break;
 				}
-			}
 			gp.setFreeBlocks(freeBlocks);
 			System.out.println(gp.getFreeBlocks());
+			}
 		}
 		else {
 			Vehicle selected = gp.getSelected();
@@ -100,7 +93,7 @@ public class ClickHandler extends MouseAdapter {
 					}
 				}
 				if ( movedTo != null )
-					selected.move(movedTo);
+					operator.move(selected, movedTo);
 			}
 			else
 				System.out.println("Pressing empty  block: vehicle not selected");

@@ -19,11 +19,11 @@ public class Block {
 		return state;
 	}
 
-	public void setState(Integer state) {
+	private void setState(Integer state) {
 		this.state = state;
 	}
 	
-	public void setOccupier(Vehicle occupier) {
+	private void setOccupier(Vehicle occupier) {
 		this.occupier = occupier;
 		if ( occupier != null )
 			setState(occupier.getBlockState());
@@ -48,5 +48,15 @@ public class Block {
 	
 	public Boolean getWinner() {
 		return winner;
+	}
+	
+	public void reset() {
+		setState(BlockType.EMPTY);
+		setOccupier(null);
+	}
+	
+	public void occupate(Vehicle v) {
+		setState(v.getBlockState());
+		setOccupier(v);
 	}
 }

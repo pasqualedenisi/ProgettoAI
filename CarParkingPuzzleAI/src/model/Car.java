@@ -11,7 +11,6 @@ public class Car implements Vehicle {
 	private ArrayList<Block> busyBlocks;
 	private Boolean mine;
 	
-	
 
 	public Car(ArrayList<Block> busyBlocks) {
 		super();
@@ -23,7 +22,7 @@ public class Car implements Vehicle {
 			else orientation = true;
 		}
 		for ( Block b : busyBlocks )
-			b.setOccupier(this);
+			b.occupate(this);
 	}
 
 	@Override
@@ -40,54 +39,9 @@ public class Car implements Vehicle {
 		return busyBlocks;
 	}
 
-	@Override
-	public void move(Block destinationBlock) {
-		System.out.println("Moving to"+destinationBlock);
-		Integer minDistance = BlockType.COLUMNS + BlockType.ROWS;
-		Integer currentDistance;
-		Integer signedDistance = minDistance;
-		Block blockMatrix[][] = Game.getInstance().getBlocks();
-		for ( Block b : busyBlocks ) {
-			blockMatrix[b.getCoordinate().getRow()][b.getCoordinate().getColumn()].setState(BlockType.EMPTY);
-			if ( orientation )
-				currentDistance = b.getCoordinate().getRow()-destinationBlock.getCoordinate().getRow();
-			else
-				currentDistance = b.getCoordinate().getColumn()-destinationBlock.getCoordinate().getColumn();
-			if ( Math.abs(currentDistance) < minDistance ) {
-				minDistance = Math.abs(currentDistance);
-				signedDistance = currentDistance;
-			}
-		}
-		System.out.println("min dist = " + minDistance);
-		ArrayList<Block> newBusyList = new ArrayList<Block>();
-		for ( Block b : busyBlocks ) {
-			Integer newPosition;
-			Block newBlockBusy;
-			if ( orientation ) {
-				newPosition = b.getCoordinate().getRow()-signedDistance;
-				newBlockBusy = blockMatrix[newPosition][b.getCoordinate().getColumn()];
-			}
-			else {
-				newPosition = b.getCoordinate().getColumn()-signedDistance;
-				newBlockBusy = blockMatrix[b.getCoordinate().getRow()][newPosition];
-			}
-			newBlockBusy.setState(this.getBlockState());
-			//newBlockBusy.setOccupier(this);
-			newBusyList.add(newBlockBusy);
-			b.setOccupier(null);
-		}
-		busyBlocks = newBusyList;
-		for ( Block b : busyBlocks ) {
-			b.setOccupier(this);
-		}
-		System.out.println("New blocks = "+busyBlocks);
-		Game.getInstance().printMatrix();
-		if ( getBlockState() == BlockType.MYCAR )
-			if (checkWin())
-				System.out.println("Finish");
-	}
 	
-	private Boolean checkWin() {
+	public Boolean checkWin() {
+		if ( ! mine ) return false;
 		for ( Block b : busyBlocks )
 			if (b.getWinner())
 				return true;
@@ -121,5 +75,15 @@ public class Car implements Vehicle {
 		else if ( !orientation && !mine )
 			return Screens.OTHER_CAR_H;
 		return null;
+	}
+	
+	@Override
+	public Coordinate[] getExtremities(VehicleOperator calculator) {
+		return calculator.calculateExtremities(this);
+	}
+	
+	@Override
+	public void setBusyBlocks(ArrayList<Block> busyBlocks) {
+		this.busyBlocks = busyBlocks;
 	}
 }
