@@ -1,7 +1,10 @@
 package model;
 
 import constants.BlockType;
+import it.unical.mat.embasp.languages.Id;
+import it.unical.mat.embasp.languages.Param;
 
+@Id("block")
 public class Block {
 
 	Coordinate coordinate;
@@ -9,10 +12,17 @@ public class Block {
 	private Vehicle occupier; //observer
 	private Boolean winner;
 	
+	
+	
+	
 	public Block(Integer row, Integer column) {
 		state = BlockType.EMPTY;
 		coordinate = new Coordinate(row,column);
 		winner = false;
+		
+		//ASP
+		rowASP = row;
+		columnASP = column;
 	}
 
 	public Integer getState() {
@@ -25,8 +35,14 @@ public class Block {
 	
 	private void setOccupier(Vehicle occupier) {
 		this.occupier = occupier;
-		if ( occupier != null )
+		if ( occupier != null ) {
 			setState(occupier.getBlockState());
+			//ASP
+			this.occupierASP = occupier.getVehicleNumber();
+		}
+		else {
+			this.occupierASP = 0;
+		}
 	}
 	
 	public Vehicle getOccupier() {
@@ -59,4 +75,47 @@ public class Block {
 		setState(v.getBlockState());
 		setOccupier(v);
 	}
+	
+	
+	@Param(0)
+	private int rowASP;
+	@Param(1)
+	private int columnASP;
+	@Param(2)
+	private int occupierASP;
+	
+	public Block() {
+	}
+	
+	public Block(int r, int c, int o) {
+		rowASP = r;
+		columnASP = c;
+		occupierASP = o;
+	}
+
+	public int getRowASP() {
+		return rowASP;
+	}
+
+	public void setRowASP(int rowASP) {
+		this.rowASP = rowASP;
+	}
+
+	public int getColumnASP() {
+		return columnASP;
+	}
+
+	public void setColumnASP(int columnASP) {
+		this.columnASP = columnASP;
+	}
+
+	public int getOccupierASP() {
+		return occupierASP;
+	}
+
+	public void setOccupierASP(int occupierASP) {
+		this.occupierASP = occupierASP;
+	}
+	
+	
 }

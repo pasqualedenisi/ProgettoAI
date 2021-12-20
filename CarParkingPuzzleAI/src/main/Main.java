@@ -1,5 +1,6 @@
 package main;
 
+import dlvManagement.DLVManager;
 import model.Game;
 import view.GameFrame;
 

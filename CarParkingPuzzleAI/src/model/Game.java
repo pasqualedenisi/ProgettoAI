@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 import constants.BlockType;
 import constants.Screens;
+import dlvManagement.DLVManager;
+import it.unical.mat.embasp.base.InputProgram;
 import levels.MatchLevel;
 import view.GameScreen;
 
@@ -16,6 +18,7 @@ import view.GameScreen;
 public class Game {
 
 	private Block[][] blocks;
+	private Block winBlock;
 	private Integer moves;
 	private Car myCar;
 	private ArrayList<Vehicle> otherVehicles;
@@ -23,6 +26,9 @@ public class Game {
 	private static Game instance;
 	private Boolean isMatrixWritten;
 	private GameScreen movesDisplayer;
+	
+	//aggiungo variabile per assegnare id
+	private int vehicleNumber = 1;
 	
 	public static Game getInstance() {
 		if (instance == null)
@@ -61,8 +67,7 @@ public class Game {
 		resetMoves();
 		this.level = levelPassed;
 		if ( isMatrixWritten ) {
-			resetMatrix();
-			otherVehicles.clear();
+			resetGame();
 		}
 		try {
 			BufferedReader bIn = new BufferedReader(new FileReader(Screens.LEVEL_PATH));
@@ -114,8 +119,10 @@ public class Game {
 								otherVehicles.add(truck);
 								break;
 							case (MatchLevel.finalPosition):
-								if ( blocks.get(0) != null )
+								if ( blocks.get(0) != null ) {
 									blocks.get(0).setWinner(true);
+									winBlock = blocks.get(0);
+								}
 								break;
 							default:
 								break;
@@ -125,6 +132,9 @@ public class Game {
 			}
 			disposeVehicles();
 			printMatrix();
+			//learnMatrix();
+			learnVehicles();
+			DLVManager.getInstance().callSynchDlv();
 			bIn.close();
 			isMatrixWritten = true;
 		} catch (IOException e) {
@@ -132,10 +142,61 @@ public class Game {
 		}
 	}
 
+	private void learnMatrix() {
+		InputProgram logicProgram = DLVManager.getInstance().getProgram();
+		try {
+			for ( int i = 0; i < BlockType.ROWS; ++i )
+				for ( int j = 0; j < BlockType.COLUMNS; ++j ) {
+					logicProgram.addObjectInput(blocks[i][j]);
+					//if (blocks[i][j].getWinner())
+					//	logicProgram.addProgram(null);
+				}
+			logicProgram.addProgram("win("+winBlock.getRowASP()+","+winBlock.getColumnASP()+").");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void learnVehicles() {
+		InputProgram logicProgram = DLVManager.getInstance().getProgram();
+		for ( Vehicle v : otherVehicles ) {
+			try {
+				if ( v instanceof Car ) {
+					Car c = (Car) v;
+					logicProgram.addObjectInput(c);
+				}
+				if ( v instanceof Truck ) {
+					Truck t = (Truck) v;
+					logicProgram.addObjectInput(t);
+				}
+				/*
+				for ( Block b :  v.getBusyBlocks() ) {
+					logicProgram.addObjectInput(b);
+				}
+				*/
+				VehicleOperator pivotCalculator = new VehicleOperator();
+				Coordinate pivot = pivotCalculator.calculateDlvPivot(v);
+				if ( pivot != null )
+					logicProgram.addProgram("pivot("+pivot.getRow()+","+pivot.getColumn()+","+v.getVehicleNumber()+").");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		logicProgram.addProgram("mycar("+myCar.getVehicleNumber()+").");
+		/*
+		for ( Block b : myCar.getBusyBlocks() )
+			try {
+				logicProgram.addObjectInput(b);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	 */
+	}
+
 	public void printMatrix() {
 		for ( int i = 0; i < BlockType.ROWS; ++i ) {
 			for ( int j = 0; j < BlockType.COLUMNS; ++j )
-				System.out.print(blocks[i][j].getState() + " ");
+				System.out.print(blocks[i][j].getOccupierASP() + " ");
 			System.out.println();
 		}
 	}
@@ -153,10 +214,20 @@ public class Game {
 		}
 	}
 	
+	private void resetGame() {
+		resetMatrix();
+		resetVehicleNumber();
+		otherVehicles.clear();
+	}
+	
 	private void resetMatrix() {
 		for ( int i = 0; i < BlockType.ROWS; ++i )
 			for ( int j = 0; j < BlockType.COLUMNS; ++j )
 				blocks[i][j].reset();
+	}
+	
+	private void resetVehicleNumber() {
+		vehicleNumber = 1;
 	}
 	
 
@@ -183,5 +254,9 @@ public class Game {
 			return false;
 		Car carMoved = (Car) v;
 		return carMoved.checkWin();
+	}
+	
+	public int getVehicleNumber() {
+		return vehicleNumber++;
 	}
 }

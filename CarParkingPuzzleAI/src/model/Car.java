@@ -4,12 +4,23 @@ import java.util.ArrayList;
 
 import constants.BlockType;
 import constants.Screens;
+import dlvManagement.DLVManager;
+import it.unical.mat.embasp.languages.Id;
+import it.unical.mat.embasp.languages.Param;
+import it.unical.mat.embasp.languages.asp.SymbolicConstant;
 
+@Id("car")
 public class Car implements Vehicle {
 	
 	private Boolean orientation; //true -> verticale; false -> orizzontale
 	private ArrayList<Block> busyBlocks;
 	private Boolean mine;
+	
+	//aggiungo id per programma logico
+	@Param(0)
+	private int vehicleNumber;
+	@Param(1)
+	private SymbolicConstant orientationDlv;
 	
 
 	public Car(ArrayList<Block> busyBlocks) {
@@ -17,12 +28,18 @@ public class Car implements Vehicle {
 		this.busyBlocks = busyBlocks;
 		mine = false;
 		if (busyBlocks.size()>1) {
-			if ( busyBlocks.get(0).getCoordinate().getRow() == busyBlocks.get(1).getCoordinate().getRow() )
+			if ( busyBlocks.get(0).getCoordinate().getRow() == busyBlocks.get(1).getCoordinate().getRow() ) {
 				orientation = false;
-			else orientation = true;
+				orientationDlv = DLVManager.horizontal;
+			}
+			else {
+				orientation = true;
+				orientationDlv = DLVManager.vertical;
+			}
 		}
 		for ( Block b : busyBlocks )
 			b.occupate(this);
+		initVehicleNumber();
 	}
 
 	@Override
@@ -32,6 +49,9 @@ public class Car implements Vehicle {
 
 	public void setOrientation(Boolean orientation) {
 		this.orientation = orientation;
+		if ( orientation )
+			setOrientationDlv(DLVManager.vertical);
+		else setOrientationDlv(DLVManager.horizontal);
 	}
 	
 	@Override
@@ -86,4 +106,27 @@ public class Car implements Vehicle {
 	public void setBusyBlocks(ArrayList<Block> busyBlocks) {
 		this.busyBlocks = busyBlocks;
 	}
+	
+	@Override
+	public void initVehicleNumber() {
+		vehicleNumber = Game.getInstance().getVehicleNumber();	
+	}
+	
+	@Override
+	public int getVehicleNumber() {
+		return vehicleNumber;
+	}
+	
+	public void setVehicleNumber(int vehicleNumber) {
+		this.vehicleNumber = vehicleNumber;
+	}
+
+	public SymbolicConstant getOrientationDlv() {
+		return orientationDlv;
+	}
+
+	public void setOrientationDlv(SymbolicConstant orientationDlv) {
+		this.orientationDlv = orientationDlv;
+	}
+	
 }

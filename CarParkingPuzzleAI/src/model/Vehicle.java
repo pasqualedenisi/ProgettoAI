@@ -10,4 +10,6 @@ public interface Vehicle {
 	public Boolean getOrientation();
 	public String getImageString();
 	public Coordinate[] getExtremities(VehicleOperator calculator);
+	public void initVehicleNumber();
+	public int getVehicleNumber();
 }

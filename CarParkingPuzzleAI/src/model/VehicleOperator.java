@@ -31,6 +31,11 @@ public class VehicleOperator {
 		return returnCoordinate;
 	}
 	
+	public Coordinate calculateDlvPivot(Vehicle v) {
+		Coordinate[] extremities = calculateExtremities(v);
+		return extremities[0];
+	}
+	
 	public void move(Vehicle v, Block destinationBlock) {
 		Game.getInstance().incrementMoves();
 		System.out.println("Moving to"+destinationBlock);
