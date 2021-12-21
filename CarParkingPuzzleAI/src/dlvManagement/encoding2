@@ -1,0 +1,74 @@
+rows(6).
+columns(6).
+row(0..5).
+column(0..5).
+
+maxMoves(7).
+
+direction(1).
+direction(-1).
+
+
+movedone(M):-occupied(_,_,_,_,_,_,M).
+%occupied(Row,Col,Veh,IsPivot,isCar,Ori,Mov)
+occupied(R,C,V,1,1,O,M):-pivot(R,C,V,M),car(V,O).
+occupied(R+1,C,V,0,1,vertical,M):-occupied(R,C,V,1,1,vertical,M).
+occupied(R,C+1,V,0,1,horizontal,M):-occupied(R,C,V,1,1,horizontal,M).
+
+occupied(R,C,V,1,0,O,M):-pivot(R,C,V,M),truck(V,O).
+occupied(R+1,C,V,0,0,vertical,M):-occupied(R,C,V,1,0,vertical,M).
+occupied(R+2,C,V,0,0,vertical,M):-occupied(R,C,V,1,0,vertical,M).
+occupied(R,C+1,V,0,0,horizontal,M):-occupied(R,C,V,1,0,horizontal,M).
+occupied(R,C+2,V,0,0,horizontal,M):-occupied(R,C,V,1,0,horizontal,M).
+
+busy(R,C,M):-occupied(R,C,_,_,_,_,M).
+free(R,C,M):-not busy(R,C,M), row(R), column(C), movedone(M).
+
+
+%canGo(Vehicle,Positions,Direction,Orientation,Row,Col,isCar,Move)
+canGo(Car,1,1,vertical,Row,Col,1,M):-occupied(Row,Col,Car,1,1,vertical,M),rows(R),Row+2<R,free(Row+2,Col,M).
+canGo(C,N+1,1,vertical,Row,Col,1,M):-canGo(C,N,1,vertical,Row,Col,1,M),rows(R),Row+2+N<R,free(Row+2+N,Col,M).
+
+canGo(Car,1,-1,vertical,Row,Col,1,M):-occupied(Row,Col,Car,1,1,vertical,M),Row>0,free(Row-1,Col,M).
+canGo(C,N+1,-1,vertical,Row,Col,1,M):-canGo(C,N,-1,vertical,Row,Col,1,M),Row-N>0,free(Row-N-1,Col,M).
+
+canGo(Car,1,1,horizontal,Row,Col,1,M):-occupied(Row,Col,Car,1,1,horizontal,M),columns(C),Col+2<C,free(Row,Col+2,M).
+canGo(C,N+1,1,horizontal,Row,Col,1,M):-canGo(C,N,1,horizontal,Row,Col,1,M),columns(NCol),Col+2+N<NCol,free(Row,Col+2+N,M).
+
+canGo(Car,1,-1,horizontal,Row,Col,1,M):-occupied(Row,Col,Car,1,1,horizontal,M),Col>0,free(Row,Col-1,M).
+canGo(C,N+1,-1,horizontal,Row,Col,1,M):-canGo(C,N,-1,horizontal,Row,Col,1,M),Col-N>0,free(Row,Col-N-1,M).
+
+canGo(Truck,1,1,vertical,Row,Col,0,M):-occupied(Row,Col,Truck,1,0,vertical,M),rows(R),Row+3<R,free(Row+3,Col,M).
+canGo(T,N+1,1,vertical,Row,Col,0,M):-canGo(T,N,1,vertical,Row,Col,0,M),rows(R),Row+3+N<R,free(Row+3+N,Col,M).
+
+canGo(Truck,1,-1,vertical,Row,Col,0,M):-occupied(Row,Col,Truck,1,0,vertical,M),Row>0,free(Row-1,Col,M).
+canGo(T,N+1,-1,vertical,Row,Col,0,M):-canGo(T,N,-1,vertical,Row,Col,0,M),Row-N>0,free(Row-N-1,Col,M).
+
+canGo(Truck,1,1,horizontal,Row,Col,0,M):-occupied(Row,Col,Truck,1,0,horizontal,M),columns(NCol),Col+3<NCol,free(Row,Col+3,M).
+canGo(T,N+1,1,horizontal,Row,Col,0,M):-canGo(T,N,1,horizontal,Row,Col,0,M),columns(NCol),Col+3+N<NCol,free(Row,Col+3+N,M).
+
+canGo(Truck,1,-1,horizontal,Row,Col,0,M):-occupied(Row,Col,Truck,1,0,horizontal,M),Col>0,free(Row,Col-1,M).
+canGo(T,N+1,-1,horizontal,Row,Col,0,M):-canGo(T,N,-1,horizontal,Row,Col,0,M),Col-N>0,free(Row,Col-N-1,M).
+
+
+%move(Vehicle,NSteps,Direction,Orientation,Row,Col,isCar,Time)
+move(V,N,D,O,R,C,T,M+1)|nonmove(V,N,D,O,R,C,T,M+1):-canGo(V,N,D,O,R,C,T,M),M<MMoves,maxMoves(MMoves).
+:-move(V1,N1,D1,O1,R1,C1,T1,M),move(V2,N2,D2,O2,R2,C2,T2,M),V1!=V2.
+:-move(V1,N1,D1,O1,R1,C1,T1,M),move(V2,N2,D2,O2,R2,C2,T2,M),D1!=D2.
+:-move(V1,N1,D1,O1,R1,C1,T1,M),move(V2,N2,D2,O2,R2,C2,T2,M),N1!=N2.
+
+pivot(R+S,C,V,M):-move(V,N,D,vertical,R,C,T,M),S=N*D.
+pivot(R,C+S,V,M):-move(V,N,D,horizontal,R,C,T,M),S=N*D.
+
+moved(V,M):-move(V,N,D,O,R,C,T,M).
+pivot(R,C,V,M):-pivot(R,C,V,M-1),not moved(V,M),move(_,_,_,_,_,_,_,M).
+
+%:-not pivot(2,4,M,4), mycar(M).
+%:-not occupied(2,2,1,0,1,horizontal,MMoves), maxMoves(MMoves).
+:-#count{V,N,D,O,R,C,T,M:move(V,N,D,O,R,C,T,M)}<MMoves, maxMoves(MMoves).
+
+
+%move(1,3,1,horizontal,2,1,1,5).
+%:-not moved(9,1).
+%:-not pivot(2,4,C,M), maxMoves(M), mycar(C).
+:-not occupied(R,C,Car,0,1,Ori,M), win(R,C), maxMoves(M), mycar(Car), car(Car,Ori).

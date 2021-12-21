@@ -159,6 +159,7 @@ public class Game {
 	
 	private void learnVehicles() {
 		InputProgram logicProgram = DLVManager.getInstance().getProgram();
+		VehicleOperator pivotCalculator = new VehicleOperator();
 		for ( Vehicle v : otherVehicles ) {
 			try {
 				if ( v instanceof Car ) {
@@ -174,14 +175,23 @@ public class Game {
 					logicProgram.addObjectInput(b);
 				}
 				*/
-				VehicleOperator pivotCalculator = new VehicleOperator();
 				Coordinate pivot = pivotCalculator.calculateDlvPivot(v);
 				if ( pivot != null )
-					logicProgram.addProgram("pivot("+pivot.getRow()+","+pivot.getColumn()+","+v.getVehicleNumber()+").");
+					logicProgram.addProgram("pivot("+pivot.getRow()+","+pivot.getColumn()+","+v.getVehicleNumber()+",0).");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		Car c = (Car) myCar;
+		try {
+			logicProgram.addObjectInput(c);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Coordinate pivot = pivotCalculator.calculateDlvPivot(c);
+		logicProgram.addProgram("pivot("+pivot.getRow()+","+pivot.getColumn()+","+c.getVehicleNumber()+",0).");
+		logicProgram.addProgram("maxMoves(7)");
 		logicProgram.addProgram("mycar("+myCar.getVehicleNumber()+").");
 		/*
 		for ( Block b : myCar.getBusyBlocks() )
