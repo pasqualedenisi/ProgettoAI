@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import dlvManagement.DLVManager;
 import model.Game;
 
 public class GameScreen extends JPanel {
@@ -22,9 +23,15 @@ public class GameScreen extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		
 		JPanel controlPane = new JPanel();
-		JButton pause = new JButton("Pause");
-		controlPane.add(pause);
-		pause.addActionListener(null);
+		JButton solve = new JButton("Solve");
+		controlPane.add(solve);
+		solve.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DLVManager.getInstance().callSynchDlv(Game.getInstance().getMaxMovesDlv(), GameScreen.this); //da spostare nel bottone solve
+			}
+		});
 		JButton restartButton = new JButton("Restart");
 		restartButton.addActionListener(new ActionListener() {
 			

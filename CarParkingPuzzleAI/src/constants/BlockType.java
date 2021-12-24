@@ -13,4 +13,7 @@ public class BlockType {
 	public final static int BLOCK_PIXELS=50;
 	public final static int FREE_MARGIN=10;
 	
+	//vehicle orientations
+	public final static String horizontal = "horizontal";
+	public final static String vertical = "vertical";
 }

@@ -26,6 +26,7 @@ public class Game {
 	private static Game instance;
 	private Boolean isMatrixWritten;
 	private GameScreen movesDisplayer;
+	private Integer maxMovesDlv = 15;
 	
 	//aggiungo variabile per assegnare id
 	private int vehicleNumber = 1;
@@ -46,6 +47,15 @@ public class Game {
 
 	public ArrayList<Vehicle> getOtherVehicles() {
 		return otherVehicles;
+	}
+	
+	public Vehicle getVehicleByNumber(Integer id) {
+		if ( id == 1 )
+			return getMyCar();
+		for ( Vehicle v : getOtherVehicles() )
+			if (v.getVehicleNumber() == id)
+				return v;
+		return null;
 	}
 
 	public Integer getLevel() {
@@ -132,9 +142,10 @@ public class Game {
 			}
 			disposeVehicles();
 			printMatrix();
-			//learnMatrix();
+			learnMatrix();
 			learnVehicles();
-			DLVManager.getInstance().callSynchDlv();
+			//DLVManager.getInstance().callSynchDlv(maxMovesDlv);
+			
 			bIn.close();
 			isMatrixWritten = true;
 		} catch (IOException e) {
@@ -144,6 +155,8 @@ public class Game {
 
 	private void learnMatrix() {
 		InputProgram logicProgram = DLVManager.getInstance().getProgram();
+		logicProgram.addProgram("win("+winBlock.getRowASP()+","+winBlock.getColumnASP()+").");
+		/*
 		try {
 			for ( int i = 0; i < BlockType.ROWS; ++i )
 				for ( int j = 0; j < BlockType.COLUMNS; ++j ) {
@@ -151,10 +164,10 @@ public class Game {
 					//if (blocks[i][j].getWinner())
 					//	logicProgram.addProgram(null);
 				}
-			logicProgram.addProgram("win("+winBlock.getRowASP()+","+winBlock.getColumnASP()+").");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	private void learnVehicles() {
@@ -182,16 +195,15 @@ public class Game {
 				e.printStackTrace();
 			}
 		}
-		Car c = (Car) myCar;
 		try {
-			logicProgram.addObjectInput(c);
+			logicProgram.addObjectInput(myCar);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Coordinate pivot = pivotCalculator.calculateDlvPivot(c);
-		logicProgram.addProgram("pivot("+pivot.getRow()+","+pivot.getColumn()+","+c.getVehicleNumber()+",0).");
-		logicProgram.addProgram("maxMoves(7)");
+		Coordinate pivot = pivotCalculator.calculateDlvPivot(myCar);
+		logicProgram.addProgram("pivot("+pivot.getRow()+","+pivot.getColumn()+","+myCar.getVehicleNumber()+",0).");
+		//logicProgram.addProgram("maxMoves(7)."); //SU QUESTO BISOGNA FARE UN CICLO E NON DARE UN NUMERO FISSATO!!
 		logicProgram.addProgram("mycar("+myCar.getVehicleNumber()+").");
 		/*
 		for ( Block b : myCar.getBusyBlocks() )
@@ -268,5 +280,9 @@ public class Game {
 	
 	public int getVehicleNumber() {
 		return vehicleNumber++;
+	}
+	
+	public Integer getMaxMovesDlv() {
+		return maxMovesDlv;
 	}
 }

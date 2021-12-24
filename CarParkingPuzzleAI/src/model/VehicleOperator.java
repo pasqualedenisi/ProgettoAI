@@ -81,4 +81,9 @@ public class VehicleOperator {
 		if (Game.getInstance().checkWin(v))
 			System.out.println("win");
 	}
+	
+//	public void dlvMove(Vehicle v) {
+//		for ( Block b : v.getBusyBlocks() )
+//
+//	}
 }
