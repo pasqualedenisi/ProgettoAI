@@ -29,7 +29,9 @@ public class GameScreen extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				Game.getInstance().factPassing();
 				DLVManager.getInstance().callSynchDlv(Game.getInstance().getMaxMovesDlv(), GameScreen.this); //da spostare nel bottone solve
+				gp.repaint();
 			}
 		});
 		JButton restartButton = new JButton("Restart");

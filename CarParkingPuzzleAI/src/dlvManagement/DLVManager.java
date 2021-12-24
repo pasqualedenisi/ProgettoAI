@@ -164,7 +164,7 @@ public class DLVManager {
 			Output o =  handler.startSync();
 			AnswerSets as = (AnswerSets) o;
 			if (as.getAnswersets().isEmpty()) {
-				System.out.println(attempt);
+				//System.out.println(attempt);
 				attempt++;
 				continue;
 			}

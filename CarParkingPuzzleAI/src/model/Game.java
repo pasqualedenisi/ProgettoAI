@@ -142,8 +142,6 @@ public class Game {
 			}
 			disposeVehicles();
 			printMatrix();
-			learnMatrix();
-			learnVehicles();
 			//DLVManager.getInstance().callSynchDlv(maxMovesDlv);
 			
 			bIn.close();
@@ -151,6 +149,11 @@ public class Game {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void factPassing() {
+		learnMatrix();
+		learnVehicles();
 	}
 
 	private void learnMatrix() {
