@@ -21,8 +21,8 @@ public class OutputManager implements Callback {
 	public void callback(Output output) {
 		int maxMoves = Game.getInstance().getMaxMovesDlv();
 		AnswerSets as = (AnswerSets) output;
-		for (AnswerSet a : as.getAnswersets())
-			System.out.println(a.toString());
+//		for (AnswerSet a : as.getAnswersets())
+//			System.out.println(a.toString());
 		if (attempt <= maxMoves && as.getAnswersets().isEmpty()) 
 			attempt++;
 		else {
