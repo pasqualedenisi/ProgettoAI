@@ -23,3 +23,14 @@ LV.2
 	othercar: 4,3;4,4
 	truck: 0,3;1,3;2,3
 	win: 2,5
+	
+LV.3
+	mycar: 2,1;2,2
+	othercar: 0,2;0,3 
+	othercar: 4,0;5,0
+	othercar: 3,2;4,2
+	othercar: 3,4;3,5
+	othercar: 5,4;5,5
+	truck: 3,3;4,3;5,3
+	truck: 0,5;1,5;2,5
+	win: 2,5
